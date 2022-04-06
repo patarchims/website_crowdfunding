@@ -27,9 +27,9 @@ func main() {
 	userRepository := user.NewRepository(db)
 	campaignRapository := campaign.NewRepository(db)
 
+	campaignService := campaign.NewService(campaignRapository)
 	userService := user.NewService(userRepository)
 	authService := auth.NewService()
-	campaignService := campaign.NewService(campaignRapository)
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
@@ -45,6 +45,7 @@ func main() {
 
 	api.GET("/campaigns", campaignHandler.GetCampaigns)
 	api.GET("/campaigns/:id", campaignHandler.GetCampaign)
+	api.POST("/campaigns", authMiddleware(authService, userService), campaignHandler.CreateCampaign)
 
 	router.Run()
 }
